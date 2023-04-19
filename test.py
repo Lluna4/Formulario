@@ -1,5 +1,7 @@
 import customtkinter
-
+import json
+import os
+import base64
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
@@ -26,6 +28,12 @@ def login():
     if usuario:
         print("a")
         if usuario["contraseña"].decode('utf-8') == entry2.get():
+            if checkbox.get() == 1:
+                with open("save.json", "w") as a:
+                    json.dump({"usuario": entry.get(), "contra":base64.b64encode(entry2.get().encode(FORMAT)).decode("utf-8")}, a)
+            else:
+                if os.path.exists("save.json"):
+                    os.remove("save.json")
             tabs()
             return
         else:
@@ -107,7 +115,16 @@ entry2.pack(pady=12, padx=10)
 button = customtkinter.CTkButton(master=frame, text="Enviar", command=login)
 button.pack(pady=12, padx=10)
 
+checkbox = customtkinter.CTkCheckBox(master=frame, text="Recuerdame")
+checkbox.pack(pady=12, padx=10)
+
 registro = customtkinter.CTkButton(master=frame, text="Registrarse", command=registro)
 registro.pack(pady=12, padx=10)
+
+if os.path.exists("save.json"):
+    with open("save.json", "r") as f:
+        credentials = json.load(f)
+    entry.insert(0, credentials["usuario"])
+    entry2.insert(0, base64.b64decode(credentials["contra"]).decode(FORMAT))
 
 root.mainloop()
