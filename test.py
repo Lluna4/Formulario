@@ -59,21 +59,30 @@ def tabs():
 
 
 def crear_cuenta():
+    global label2
     col = db["login"]
     usuario = entry.get()
-    usuario = col.find_one({"nombre": usuario})
-    if usuario:
-        entry.delete(0, "end")
-        entry2.delete(0, "end")
+    if not usuario:
         if label2:
             label2.configure(require_redraw=True, text="El usuario es incorrecto")
         else:
             label2 = customtkinter.CTkLabel(master=frame, text="El usuario es incorrecto", text_color=("red", "red"))
             label2.pack(pady=12, padx=10)
         return
+    usuario = col.find_one({"nombre": usuario})
+    if usuario:
+        entry.delete(0, "end")
+        entry2.delete(0, "end")
+        if label2:
+            label2.configure(require_redraw=True, text="El usuario ya existe")
+        else:
+            label2 = customtkinter.CTkLabel(master=frame, text="El usuario ya existe", text_color=("red", "red"))
+            label2.pack(pady=12, padx=10)
+        return
     datos = {"nombre": entry.get(), "contraseña": entry2.get().encode(FORMAT)}
     col.insert_one(datos)
     tabs()
+
 
 
 def registro():
@@ -86,7 +95,7 @@ def registro():
 frame = customtkinter.CTkFrame(master=root)
 frame.pack(pady=20, padx=60, fill="both", expand=True)
 
-label = customtkinter.CTkLabel(master=frame, text="TEST", font=("Calibri", 24))
+label = customtkinter.CTkLabel(master=frame, text="Login", font=("Calibri", 24))
 label.pack(pady=12, padx=10)
 
 entry = customtkinter.CTkEntry(master=frame, placeholder_text="Usuario")
